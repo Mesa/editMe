@@ -27,15 +27,18 @@ Which type of field should be displayed.
 Requirements
 -------------------
 jQuery 1.8.2
-(because its now the current jQuery Library, feel free to test older releases and please tell me if it worked)
+(because its now the current jQuery library, feel free to test older releases and please tell me if it works)
 
 Bugs
 ------------
 This are all features!!!
+Bug reports, Ideas and feedback is welcome.
 
 License
 -----------
-Feel free to use EditMe for free, all i want
+Attribution-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0)
+    http://creativecommons.org/licenses/by-nc-sa/3.0/
+
 
 Installation
 ------------
