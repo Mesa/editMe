@@ -16,36 +16,63 @@ HTML options
 -------------------
 Every HTML element could have the "data" attributes, the following are required or optional for editMe.
 
-`required`
+        data-name
 Like the input name, this will be the key in the JSON Array.
-    data-name
 
-
-`optional`
+        data-readonly
 Could be empty, this is like an hidden field.
-    data-readonly
 
 
-For the first element
+To configure editMe you can set the default vars with the first element.
 ```javascript
 $("p").editMe({
-    css_highlight_class : "your-css-class",
-    target_url : "data_destination.php",
+    css_highlight_class : "<your-css-class>",
+    target_url : "destination.php",
+    callback: yourCallbackFunction,
     edit_btn_txt : "Bearbeiten",
     cancel_btn_txt: "Abbrechen",
     save_btn_txt: "Speichern",
-    menu_target_id:"menu",
-    callback: yourCallbackFunction
+    menu_target_id: "<your-menu-id>", // id to append the Buttons
+    save_btn_id :"<your-btn-id>", // or tell editMe the buttons to use
+    cancel_btn_id: "<your-btn-id>",
+    edit_btn_id: "<your-btn-id>"
+});
+```
+
+Only the first element needs the global vars, for the next elements you need only the item vars.
+```javascript
+$("ul").editMe({
+    css_highlight_class : "your-css-class", // optional
+    target_url : "destination.php",
+    callback: yourCallbackFunction // callback for all items *optional*
 });
 ```
 
 ```javascript
 $("ul").editMe({
-    css_highlight_class : "edit-me-highlight3",
-    target_url : "data_destination.php",
+    css_highlight_class : "your-css-class",
+    target_url : "destination.php",
     callback: {
-        username: testing
+        username: testing // callback for items named "username"
     }
+});
+```
+
+Special Input
+-----------------
+Sometimes you need some special input fields, jQueryUi got some nice plugins, like Datepicker or
+Autocomplete. To define an autocomplete field or a datepicker you add following lines to you config :
+
+```javascript
+$("ul").editMe({
+    <nam-of-your-field>: {
+        type: "autocomplete",
+       source: "<path-to-your-php-file(response.php)>",
+       minLength : 2
+    },
+    date: {
+        type: "datepicker"
+    },
 });
 ```
 
@@ -59,7 +86,7 @@ jQueryUi 1.9.1
 Bugs
 ------------
 This are all features!!!
-Bug reports, suggestions and feedback is welcome.
+Bug reports, suggestions and/or feedback is welcome.
 
 
 License

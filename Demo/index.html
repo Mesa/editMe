@@ -31,7 +31,10 @@
                 color: white;
             }
             .edit-me-highlight3 {
-                border-bottom: 1px dashed steelblue;
+                border-bottom: 1px dashed steelblue !important;
+            }
+            .hasDatepicker {
+                border: 0px solid white;
             }
         </style>
     </head>
@@ -59,11 +62,34 @@
             <li>Username:<span data-name="username">Testuser</span></li>
             <li>Password:<span data-name="password">password1</span></li>
             <li>Description: <span data-name="desc">A very long text about the user</span></li>
+            <li>Date: <span data-name="date">20.01.2012</span></li>
         </ul>
         <div id="menu">
         </div>
         <script type="text/javascript">
             $(document).ready( function () {
+/**
+ * jqueryui datepicker config
+ */
+$.datepicker.regional['de'] = {
+            clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
+            closeText: 'schließen', closeStatus: 'ohne Änderungen schließen',
+            prevText: '<zurück', prevStatus: 'letzten Monat zeigen',
+            nextText: 'Vor>', nextStatus: 'nächsten Monat zeigen',
+            currentText: 'heute', currentStatus: '',
+            monthNames: ['Januar','Februar','März','April','Mai','Juni',
+            'Juli','August','September','Oktober','November','Dezember'],
+            monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
+            'Jul','Aug','Sep','Okt','Nov','Dez'],
+            monthStatus: 'anderen Monat anzeigen', yearStatus: 'anderes Jahr anzeigen',
+            weekHeader: 'Wo', weekStatus: 'Woche des Monats',
+            dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+            dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+            dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+            dayStatus: 'Setze DD als ersten Wochentag', dateStatus: 'Wähle D, M d',
+            dateFormat: 'dd.mm.yy', firstDay: 1,
+            initStatus: 'Wähle ein Datum', isRTL: false};
+        $.datepicker.setDefaults($.datepicker.regional['de']);
 
                 $("p").editMe({
                     css_highlight_class : "edit-me-highlight1",
@@ -73,6 +99,7 @@
                     menu_target_id:"menu",
                     callback: besting
                 });
+                
                $("h1").editMe({
                     css_highlight_class : "edit-me-highlight2",
                     target_url : "response.php"
@@ -80,6 +107,14 @@
                 $("ul").editMe({
                     css_highlight_class : "edit-me-highlight3",
                     target_url : "response.php",
+                    username: {
+                        type: "autocomplete",
+                       source: "response.php?get=autocomplete",
+                       minLength : 2
+                    },
+                    date: {
+                        type: "datepicker"
+                    },
                     callback: {
                         username: testing
                     }

@@ -35,7 +35,7 @@
                     if ( typeof config.menu_target_id !== undefined) {
                         var menu_target = $("#" + config.menu_target_id);
                         menu_target.append(
-                        "<button id=\"" + config.edit_btn_id + "\">" + config.edit_btn_txt + "</button>\
+                            "<button id=\"" + config.edit_btn_id + "\">" + config.edit_btn_txt + "</button>\
                         <button id=\"" + config.save_btn_id + "\">" + config.save_btn_txt + "</button>\
                         <button id=\"" + config.cancel_btn_id + "\">" + config.cancel_btn_txt + "</button>"
                             );
@@ -147,21 +147,40 @@ function editMeObj ( objects, options ) {
         if ( items.length == 0) {
             return
         };
+        var self = this;
+
         items.each( function (){
             var childNodes = $(this).find("[data-name]");
             var input = new Array();
 
             if (childNodes.length > 0 ) {
                 childNodes.each( function (){
-                    input.push(new editMeInput( $(this), options, tabindex++ ) );
+                    input.push( self.buildInput($(this), options, tabindex++) );
                 });
             } else {
-                input.push(new editMeInput( $(this), options, tabindex++ ) );
+                input.push( self.buildInput($(this), options, tabindex++) );
             }
 
             groups.push(  input );
         });
 
+    }
+
+    this.buildInput = function ( item, options, index) {
+        var name = item.data("name");
+        if ( typeof options[name] == "undefined" || typeof options[name].type  == "undefined") {
+            return new editMeInput( item, options, index );
+        }
+
+        if ( options[name].type  == "autocomplete" ) {
+            return new editMeAutocomplete( item, options, index);
+        }
+
+        if ( options[name].type  == "datepicker" ) {
+            return new editMeDatepicker( item, options, index);
+        }
+
+        alert("No type selected");
     }
 
     this.activate = function () {
@@ -216,22 +235,13 @@ function editMeObj ( objects, options ) {
         }
 
         if ( group_data.length > 0) {
-            var request = $.ajax({
-                url: target_url,
-                type: "POST",
-                data : {"data":group_data},
-                  statusCode: {
-                    404: function() {
-                        /**
-                         * @todo add real error handling !!
-                         */
-                      alert("Sorry but this was not planed and I couldn't save the data");
-                    },
-                    500: function() {
-                        alert("Internal Server error");
-                    }
+            $.post( target_url, {
+                data: group_data
+            }, function ( data ) {
+                if ( data.status != 200) {
+                    alert("I'am sorry but something went wrong")
                 }
-            });
+            }, "json")
         }
     }
 
@@ -278,7 +288,7 @@ function editMeInput ( object, options, index )
 
     this.getValue = function () {
         if (this.is_readonly() || typeof options.callback == "undefined") {
-              return item.text();
+            return item.text();
         }
 
         var user_func = options.callback[this.getName()];
@@ -320,6 +330,205 @@ function editMeInput ( object, options, index )
         }
 
         item.removeClass(css_class, 500).attr("contenteditable", false);
+        return this;
+    }
+
+    this.reset = function ()
+    {
+        if ( this.is_readonly()) {
+            return
+        }
+
+        if ( this.has_changed() ) {
+            item.text( oldData );
+        }
+
+        return this;
+    }
+
+}
+
+function editMeAutocomplete ( object, options, index )
+{
+    var item = object;
+    var oldData;
+    var css_class = options.css_highlight_class
+    var readonly = false;
+    var tabindex = index;
+
+    this.is_readonly = function () {
+        if (typeof item.data("readonly") != "undefined") {
+            return true
+        } else {
+            return false;
+        }
+    }
+
+    this.has_changed = function () {
+        if ( oldData != this.getValue() ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    this.getName = function () {
+        return item.data("name");
+    }
+
+    this.getValue = function () {
+        if (this.is_readonly() || typeof options.callback == "undefined") {
+            return item.text();
+        }
+
+        var user_func = options.callback[this.getName()];
+        if ( typeof options.callback == "object" && typeof user_func != "undefined") {
+            return user_func( item.text() );
+        }
+
+        if ( typeof options.callback == "function" ) {
+            user_func = options.callback
+            return user_func( item.text() );
+        }
+
+        return item.text();
+    }
+
+    this.activate = function ()
+    {
+        if ( this.is_readonly() || typeof item.data("name") == "undefined") {
+            return
+        }
+
+        if (typeof oldData == "undefined") {
+            oldData = item.text();
+            item.autocomplete({
+                source: options[this.getName()].source,
+                minLength: options[this.getName()].minLength
+            })
+            item.attr("tabindex", tabindex);
+        }
+
+        item.addClass(css_class, 500).attr("contenteditable", true);
+        return this;
+    }
+
+    this.standby = function ()
+    {
+        if ( this.is_readonly() ) {
+            return
+        }
+
+        if ( this.has_changed() ) {
+            item.text( this.getValue() )
+        }
+
+        item.removeClass(css_class, 500).attr("contenteditable", false);
+        return this;
+    }
+
+    this.reset = function ()
+    {
+        if ( this.is_readonly()) {
+            return
+        }
+
+        if ( this.has_changed() ) {
+            item.text( oldData );
+        }
+
+        return this;
+    }
+
+}
+
+
+function editMeDatepicker ( object, options, index )
+{
+    var item = object;
+    var oldData;
+    var css_class = options.css_highlight_class
+    var readonly = false;
+    var tabindex = index;
+    var input;
+    this.is_readonly = function () {
+        if (typeof item.data("readonly") != "undefined") {
+            return true
+        } else {
+            return false;
+        }
+    }
+
+    this.has_changed = function () {
+        if ( oldData != this.getValue() ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    this.getName = function () {
+        return item.data("name");
+    }
+
+    this.getValue = function () {
+        if (this.is_readonly() || typeof options.callback == "undefined") {
+            return item.text();
+        }
+
+        var user_func = options.callback[this.getName()];
+        if ( typeof options.callback == "object" && typeof user_func != "undefined") {
+            return user_func( item.text() );
+        }
+
+        if ( typeof options.callback == "function" ) {
+            user_func = options.callback
+            return user_func( item.text() );
+        }
+
+        return item.text();
+    }
+
+    this.activate = function ()
+    {
+        if ( this.is_readonly() || typeof item.data("name") == "undefined") {
+            return
+        }
+
+        if (typeof oldData == "undefined") {
+            oldData = item.text();
+            var newItem = $("<input type=\"text\" size=\"10\">");
+            newItem.data("name", item.data("name"));
+            newItem.val(item.text());
+            newItem.change( function (){
+                item.text(newItem.val())
+            })
+            item.after(newItem);
+            newItem.datepicker({
+                changeMonth: true,
+                changeYear: true
+            });
+            item.attr("tabindex", tabindex);
+            input = newItem;
+            input.hide();
+        }
+        input.show().addClass(css_class, 500);
+        item.hide();
+        return this;
+    }
+
+    this.standby = function ()
+    {
+        if ( this.is_readonly() ) {
+            return
+        }
+
+        if ( this.has_changed() ) {
+            item.text( this.getValue() )
+        }
+        input.hide();
+        item.show();
+//        item.removeClass(css_class, 500).attr("contenteditable", false);
         return this;
     }
 
