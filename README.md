@@ -1,38 +1,64 @@
 editMe
 ======
 
-jQuery Plugin for on page content editing
+jQuery Plugin for on page content editing and some Ajax magic to save the changed data.
 
 What is EditMe?
 -----------------
-EditMe is a jQuery Plugin to allow on page content editing and saving data with a Ajax Post request.
-For Example: your Administration Area got a List displaying Name, E-Mail, Last Login and so on...
-When you want to edit the User data you normaly create an extra "edit user" Page or use a jQuery Dialog.
-Now you can hit an edit Button and change the Username right in place. When you're ready yout hit the
-save Button and all changed data go via Ajax POST request to your server.
+EditMe is a jQuery plugin to allow on page content editing and saving data with a Ajax JSON request.
+For Example: your Administration Area has a userlist, displaying: Name, E-Mail, Last Login and so on...
+When you want to edit the user data, you normaly create an extra "edit user" Page or use a jQuery Dialog.
+Now you can hit an edit button and change the username right in place. When you're ready, you hit the
+save button and all changed data go via Ajax request to your server.
 
 
 HTML options
 -------------------
-    data-name
-Like the input name, this will be the key in the JSON Array
+Every HTML element could have the "data" attributes, the following are required or optional for editMe.
 
+`required`
+    data-name
+Like the input name, this will be the key in the JSON Array.
+
+`optional`
     data-readonly
 Could be empty, this is like an hidden field.
 
-    data-type
-Which type of field should be displayed.
+For the first element
+```javascript
+$("p").editMe({
+    css_highlight_class : "your-css-class",
+    target_url : "data_destination.php",
+    edit_btn_txt : "Bearbeiten",
+    cancel_btn_txt: "Abbrechen",
+    save_btn_txt: "Speichern",
+    menu_target_id:"menu",
+    callback: yourCallbackFunction
+});
+```
 
+```javascript
+$("ul").editMe({
+    css_highlight_class : "edit-me-highlight3",
+    target_url : "data_destination.php",
+    callback: {
+        username: testing
+    }
+});
+```
 
 Requirements
 -------------------
 jQuery 1.8.2
-(because its now the current jQuery library, feel free to test older releases and please tell me if it works)
+jQueryUi 1.9.1
+(because its the current jQuery library, feel free to test older releases and please tell me if it works)
+
 
 Bugs
 ------------
 This are all features!!!
-Bug reports, Ideas and feedback is welcome.
+Bug reports, suggestions and feedback is welcome.
+
 
 License
 -----------
@@ -44,6 +70,7 @@ Installation
 ------------
 comming soon.
 
+
 Documentation
 -------------
-You are actually read the Documentation. Try again.
+You read the Documentation just now. Try again.

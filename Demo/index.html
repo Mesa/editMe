@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EditMe Demo</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <!-- change to the path where your jQery library is located -->
+        <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+        <script src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css">
+        <!-- -->
+
+        <!-- Here goes the path to the EditMe plugin in your project-->
+        <script src="../editMe.js" type="text/javascript"></script>
+        <!--  -->
+
+        <!-- this css file coud be ignored and is only used to let this Demo look pretty -->
+        <link rel="stylesheet" href="style.css">
+        <!-- -->
+
+        <!-- you can copy and paste all needed CSS rules to make EditMe look pretty -->
+        <style type="text/css">
+            * {
+                margin: 0px;
+            }
+            .edit-me-highlight1 {
+                background-color: cornsilk;
+            }
+            .edit-me-highlight2 {
+                background-color: steelblue;
+                color: white;
+            }
+            .edit-me-highlight3 {
+                border-bottom: 1px dashed steelblue;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 data-name="headline">EditMe Demo</h1>
+
+        <p data-name="ex_input" data-url="test.php">Früher wäre ich ein Input Feld gewesen</p>
+        <p data-name="ex_input2" >Ich bin ein neuer Datensatz</p>
+
+        <ul>
+            <li>Userid etc...:<span data-name="id" data-readonly>md5_hash</span></li>
+            <li>Username:<span data-name="username">Testuser</span></li>
+            <li>Password:<span data-name="password">password1</span></li>
+            <li>Description: <span data-name="desc">A very long text about the user</span></li>
+        </ul>
+        <p data-name="new">a new User</p>
+        <ul>
+            <li>Userid etc...:<span data-name="id" data-readonly>md5_hash</span></li>
+            <li>Username:<span data-name="username">Testuser2</span></li>
+            <li>Password:<span data-name="password">password2</span></li>
+            <li>Description: <span data-name="desc">A very long text about the user2</span></li>
+        </ul>
+        <ul>
+            <li>Userid etc...:<span data-name="id" data-readonly>md5_hash</span></li>
+            <li>Username:<span data-name="username">Testuser</span></li>
+            <li>Password:<span data-name="password">password1</span></li>
+            <li>Description: <span data-name="desc">A very long text about the user</span></li>
+        </ul>
+        <div id="menu">
+        </div>
+        <script type="text/javascript">
+            $(document).ready( function () {
+
+                $("p").editMe({
+                    css_highlight_class : "edit-me-highlight1",
+                    edit_btn_txt : "Bearbeiten",
+                    cancel_btn_txt: "Abbrechen",
+                    save_btn_txt: "Speichern",
+                    menu_target_id:"menu",
+                    callback: besting
+                });
+               $("h1").editMe({
+                    css_highlight_class : "edit-me-highlight2",
+                    target_url : "response.php"
+                });
+                $("ul").editMe({
+                    css_highlight_class : "edit-me-highlight3",
+                    target_url : "response.php",
+                    callback: {
+                        username: testing
+                    }
+                });
+            });
+
+function testing( text ) {
+    return text;
+}
+
+function besting ( text ) {
+    return text;
+}
+
+        </script>
+    </body>
+</html>
