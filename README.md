@@ -17,12 +17,14 @@ HTML options
 Every HTML element could have the "data" attributes, the following are required or optional for editMe.
 
 `required`
-    data-name
 Like the input name, this will be the key in the JSON Array.
+    data-name
+
 
 `optional`
-    data-readonly
 Could be empty, this is like an hidden field.
+    data-readonly
+
 
 For the first element
 ```javascript
