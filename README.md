@@ -22,6 +22,8 @@ Like the input name, this will be the key in the JSON Array.
         data-readonly
 Could be empty, this is like an hidden field.
 
+Plugin Options
+--------------------
 
 To configure editMe you can set the default vars with the first element.
 ```javascript
@@ -44,7 +46,8 @@ Only the first element needs the global vars, for the next elements you need onl
 $("ul").editMe({
     css_highlight_class : "your-css-class", // optional
     target_url : "destination.php",
-    callback: yourCallbackFunction // callback for all items *optional*
+    callback: yourCallbackFunction, // callback for all items *optional*
+    options: {}                                   // options for your callback *optional*
 });
 ```
 
@@ -52,8 +55,9 @@ $("ul").editMe({
 $("ul").editMe({
     css_highlight_class : "your-css-class",
     target_url : "destination.php",
-    callback: {
-        username: testing // callback for items named "username"
+    username: {                                     // name provide by html attribute "data-name"
+        callback: yourCallbackFunction,  // callback for items named "username"
+        options:  "text"                              // options for your callback
     }
 });
 ```
@@ -65,21 +69,22 @@ Autocomplete. To define an autocomplete field or a datepicker you add following 
 
 ```javascript
 $("ul").editMe({
-    <nam-of-your-field>: {
-        type: "autocomplete",
-       source: "<path-to-your-php-file(response.php)>",
+    username: {                                          // name provide by html attribute "data-name"
+        type: "autocomplete",                       // type to display. The options are ( autocomplete | datepicker | input)
+       source: "<path-to-your-php-file>", // response.php for example
        minLength : 2
     },
     date: {
-        type: "datepicker"
+        type: "datepicker"                              // type to display. The options are ( autocomplete | datepicker | input)
     },
 });
 ```
+The type attribute is optional and the default value is input
 
 Requirements
 -------------------
-jQuery 1.8.2
-jQueryUi 1.9.1
+* jQuery 1.8.2
+* jQueryUi 1.9.1
 (because its the current jQuery library, feel free to test older releases and please tell me if it works)
 
 

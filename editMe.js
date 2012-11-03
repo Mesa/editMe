@@ -28,7 +28,7 @@
              */
             if ( settings.started == false) {
                 var save_btn = $("#" + config.save_btn_id);
-                var edit_btn = $("#" + config.save_btn_id);
+                var edit_btn = $("#" + config.edit_btn_id);
                 var cancel_btn = $("#" + config.cancel_btn_id);
 
                 if ( save_btn.length == 0 || edit_btn.length == 0 || cancel_btn.length == 0) {
@@ -147,6 +147,7 @@ function editMeObj ( objects, options ) {
         if ( items.length == 0) {
             return
         };
+
         var self = this;
 
         items.each( function (){
@@ -168,16 +169,34 @@ function editMeObj ( objects, options ) {
 
     this.buildInput = function ( item, options, index) {
         var name = item.data("name");
-        if ( typeof options[name] == "undefined" || typeof options[name].type  == "undefined") {
-            return new editMeInput( item, options, index );
+        var object;
+
+        if (
+            typeof options[name] == "undefined"
+            || typeof options[name].type  == "undefined"
+            || options[name].type  == "input"
+            ) {
+            object = new editMeInput( );
+            object.setItem( item )
+            object.setOptions( options )
+            object.setIndex( index )
+            return object;
         }
 
         if ( options[name].type  == "autocomplete" ) {
-            return new editMeAutocomplete( item, options, index);
+            object = new editMeAutocomplete( );
+            object.setItem( item )
+            object.setOptions( options )
+            object.setIndex( index )
+            return object;
         }
 
         if ( options[name].type  == "datepicker" ) {
-            return new editMeDatepicker( item, options, index);
+            object = new editMeDatepicker( );
+            object.setItem( item )
+            object.setOptions( options )
+            object.setIndex( index )
+            return object;
         }
 
         alert("No type selected");
@@ -197,8 +216,9 @@ function editMeObj ( objects, options ) {
 
     this.cancel = function () {
         if ( items.length == 0) {
-            return;
+            return
         };
+
         for (var i = 0; i < groups.length; i++) {
             for (var z = 0; z < groups[i].length; z++) {
                 groups[i][z].standby();
@@ -258,291 +278,240 @@ function editMeObj ( objects, options ) {
     }
 }
 
-function editMeInput ( object, options, index )
+function editMeInput ( )
 {
-    var item = object;
-    var oldData;
-    var css_class = options.css_highlight_class
-    var readonly = false;
-    var tabindex = index;
-
-    this.is_readonly = function () {
-        if (typeof item.data("readonly") != "undefined") {
-            return true
-        } else {
-            return false;
-        }
-    }
-
-    this.has_changed = function () {
-        if ( oldData != this.getValue() ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    this.getName = function () {
-        return item.data("name");
-    }
-
-    this.getValue = function () {
-        if (this.is_readonly() || typeof options.callback == "undefined") {
-            return item.text();
-        }
-
-        var user_func = options.callback[this.getName()];
-        if ( typeof options.callback == "object" && typeof user_func != "undefined") {
-            return user_func( item.text() );
-        }
-
-        if ( typeof options.callback == "function" ) {
-            user_func = options.callback
-            return user_func( item.text() );
-        }
-
-        return item.text();
-    }
-
-    this.activate = function ()
-    {
-        if ( this.is_readonly() || typeof item.data("name") == "undefined") {
-            return
-        }
-
-        if (typeof oldData == "undefined") {
-            oldData = item.text();
-            item.attr("tabindex", tabindex);
-        }
-
-        item.addClass(css_class, 500).attr("contenteditable", true);
-        return this;
+    this.config = {
     }
 
     this.standby = function ()
     {
         if ( this.is_readonly() ) {
-            return
+            return this;
         }
 
-        if ( this.has_changed() ) {
-            item.text( this.getValue() )
-        }
+        this.item.text( this.getValue() )
 
-        item.removeClass(css_class, 500).attr("contenteditable", false);
+        this.item.removeClass(this.css_class, 500).attr("contenteditable", false).removeAttr("tabindex");
         return this;
     }
 
     this.reset = function ()
     {
         if ( this.is_readonly()) {
-            return
+            return this;
         }
 
         if ( this.has_changed() ) {
-            item.text( oldData );
+            this.item.text( this.oldData );
         }
 
         return this;
     }
 
-}
+    this.setItem = function ( object ) {
+        this.item = object;
+    }
 
-function editMeAutocomplete ( object, options, index )
-{
-    var item = object;
-    var oldData;
-    var css_class = options.css_highlight_class
-    var readonly = false;
-    var tabindex = index;
+    this.setOptions = function ( options ) {
+        this.css_class = options.css_highlight_class;
+        this.options = options;
+    }
 
-    this.is_readonly = function () {
-        if (typeof item.data("readonly") != "undefined") {
-            return true
-        } else {
-            return false;
-        }
+    this.setIndex = function ( index ) {
+        this.index = index;
+    }
+
+    this.getName = function () {
+        return this.item.data("name");
     }
 
     this.has_changed = function () {
-        if ( oldData != this.getValue() ) {
+        if ( this.oldData != this.getValue() ) {
             return true;
         } else {
             return false;
         }
     }
 
-    this.getName = function () {
-        return item.data("name");
-    }
-
     this.getValue = function () {
-        if (this.is_readonly() || typeof options.callback == "undefined") {
-            return item.text();
+        if (this.is_readonly()) {
+            return this.item.text();
         }
 
-        var user_func = options.callback[this.getName()];
-        if ( typeof options.callback == "object" && typeof user_func != "undefined") {
-            return user_func( item.text() );
+        if (
+            typeof this.options[this.getName()] == "object"
+            && typeof this.options[this.getName()].callback == "object"
+            && typeof this.options[this.getName()].callback.name == "function"
+            ) {
+            return this.options[this.getName()].callback.name(
+                this.item.text(),
+                this.options[this.getName()].callback.options || ""
+                );
         }
 
-        if ( typeof options.callback == "function" ) {
-            user_func = options.callback
-            return user_func( item.text() );
+        if (
+            typeof this.options.callback == "object"
+            && typeof this.options.callback.name == "function" ) {
+            return this.options.callback.name( this.item.text(), this.options.callback.options || "");
         }
 
-        return item.text();
+        return this.item.text();
     }
 
-    this.activate = function ()
-    {
-        if ( this.is_readonly() || typeof item.data("name") == "undefined") {
-            return
+    this.activate = function () {
+
+        if ( this.is_readonly() || typeof this.item.data("name") == "undefined") {
+            return this;
         }
 
-        if (typeof oldData == "undefined") {
-            oldData = item.text();
-            item.autocomplete({
-                source: options[this.getName()].source,
-                minLength: options[this.getName()].minLength
-            })
-            item.attr("tabindex", tabindex);
+        if (typeof this.oldData == "undefined") {
+            this.oldData = this.item.text();
         }
 
-        item.addClass(css_class, 500).attr("contenteditable", true);
+        this.item.addClass(this.css_class, 500).attr("contenteditable", true).attr("tabindex", tabindex);
         return this;
     }
 
-    this.standby = function ()
-    {
-        if ( this.is_readonly() ) {
-            return
-        }
-
-        if ( this.has_changed() ) {
-            item.text( this.getValue() )
-        }
-
-        item.removeClass(css_class, 500).attr("contenteditable", false);
-        return this;
-    }
-
-    this.reset = function ()
-    {
-        if ( this.is_readonly()) {
-            return
-        }
-
-        if ( this.has_changed() ) {
-            item.text( oldData );
-        }
-
-        return this;
-    }
-
-}
-
-
-function editMeDatepicker ( object, options, index )
-{
-    var item = object;
-    var oldData;
-    var css_class = options.css_highlight_class
-    var readonly = false;
-    var tabindex = index;
-    var input;
     this.is_readonly = function () {
-        if (typeof item.data("readonly") != "undefined") {
+
+        if (typeof this.item.data("readonly") != "undefined") {
             return true
         } else {
             return false;
         }
     }
 
-    this.has_changed = function () {
-        if ( oldData != this.getValue() ) {
-            return true;
-        } else {
-            return false;
+    this.copyCss = function ( origin, destination ) {
+
+        var attr = new Array(
+            "fontSize",
+            "fontFamily",
+            "width",
+            "height",
+            "color",
+            "padding"
+            );
+
+        for (i=0; i < attr.length; i++) {
+            destination.css(attr[i], origin.css(attr[i]))
         }
     }
+}
 
-    this.getName = function () {
-        return item.data("name");
-    }
-
-    this.getValue = function () {
-        if (this.is_readonly() || typeof options.callback == "undefined") {
-            return item.text();
-        }
-
-        var user_func = options.callback[this.getName()];
-        if ( typeof options.callback == "object" && typeof user_func != "undefined") {
-            return user_func( item.text() );
-        }
-
-        if ( typeof options.callback == "function" ) {
-            user_func = options.callback
-            return user_func( item.text() );
-        }
-
-        return item.text();
-    }
+editMeAutocomplete = function () {
+    var config = this.config;
+    config.min_length = 2;
 
     this.activate = function ()
     {
-        if ( this.is_readonly() || typeof item.data("name") == "undefined") {
-            return
+        if (
+            this.is_readonly()
+            || typeof this.item.data("name") == "undefined"
+            ) {
+            return this;
         }
 
-        if (typeof oldData == "undefined") {
-            oldData = item.text();
-            var newItem = $("<input type=\"text\" size=\"10\">");
-            newItem.data("name", item.data("name"));
-            newItem.val(item.text());
+        if (
+            typeof this.oldData == "undefined"
+            && typeof this.options[this.getName()].source !== "undefined"
+            ) {
+            this.oldData = this.item.text();
+            this.item.autocomplete({
+                source: this.options[this.getName()].source,
+                minLength: this.options[this.getName()].minLength || config.min_length
+            });
+
+            this.item.attr("tabindex", tabindex);
+        }
+
+        this.item.addClass(this.css_class, 500).attr("contenteditable", true);
+        return this;
+    }
+};
+
+editMeAutocomplete.prototype = new editMeInput(  );
+
+editMeDatepicker = function () {
+    var newItem;
+    var self = this;
+
+    this.activate = function ()
+    {
+        if ( this.is_readonly() || typeof this.item.data("name") == "undefined") {
+            return this
+        }
+
+        if (typeof this.oldData == "undefined") {
+            this.oldData = this.item.text();
+
+            newItem = $("<input type=\"text\" size=\"10\">");
+            newItem.data("name", this.item.data("name"));
+            newItem.val(this.item.text());
             newItem.change( function (){
-                item.text(newItem.val())
-            })
-            item.after(newItem);
+                self.item.text(newItem.val())
+            });
+
+            this.copyCss(this.item, newItem)
+            this.item.after(newItem);
             newItem.datepicker({
                 changeMonth: true,
                 changeYear: true
             });
-            item.attr("tabindex", tabindex);
-            input = newItem;
-            input.hide();
+
+            this.item.attr("tabindex", tabindex);
+            newItem.hide();
         }
-        input.show().addClass(css_class, 500);
-        item.hide();
+        newItem.show().addClass(this.css_class, 500);
+        this.item.hide();
         return this;
     }
 
-    this.standby = function ()
-    {
+    this.standby = function () {
         if ( this.is_readonly() ) {
-            return
-        }
+            return this
+            }
 
         if ( this.has_changed() ) {
-            item.text( this.getValue() )
+            this.item.text( this.getValue() )
         }
-        input.hide();
-        item.show();
-//        item.removeClass(css_class, 500).attr("contenteditable", false);
+        newItem.hide();
+        this.item.show();
         return this;
     }
 
     this.reset = function ()
     {
         if ( this.is_readonly()) {
-            return
-        }
+            return this
+            }
 
         if ( this.has_changed() ) {
-            item.text( oldData );
+            this.item.text( this.oldData );
         }
 
         return this;
     }
+}
 
+editMeDatepicker.prototype = new editMeInput(  );
+
+function onlyInt( text ) {
+    return parseInt(text)
+}
+
+function maxLength( text, length ) {
+    return text.substr(0, length);
+}
+
+function matchRegEx( text, regex ) {
+    var match = text.match(regex)
+    if ( null == match ) {
+        return "";
+    } else {
+        return match[0];
+    }
+}
+
+function replaceRegEx( text, options) {
+    return text.replace(options.search, options.replace);
 }

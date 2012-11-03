@@ -31,7 +31,7 @@
                 color: white;
             }
             .edit-me-highlight3 {
-                border-bottom: 1px dashed steelblue !important;
+                color: red;
             }
             .hasDatepicker {
                 border: 0px solid white;
@@ -56,13 +56,14 @@
             <li>Username:<span data-name="username">Testuser2</span></li>
             <li>Password:<span data-name="password">password2</span></li>
             <li>Description: <span data-name="desc">A very long text about the user2</span></li>
+            <li>Date: <span data-name="datum">22.01.2012</span></li>
         </ul>
         <ul>
             <li>Userid etc...:<span data-name="id" data-readonly>md5_hash</span></li>
             <li>Username:<span data-name="username">Testuser</span></li>
             <li>Password:<span data-name="password">password1</span></li>
             <li>Description: <span data-name="desc">A very long text about the user</span></li>
-            <li>Date: <span data-name="date">20.01.2012</span></li>
+            <li>Date: <span data-name="datum">20.01.2012</span></li>
         </ul>
         <div id="menu">
         </div>
@@ -97,9 +98,14 @@ $.datepicker.regional['de'] = {
                     cancel_btn_txt: "Abbrechen",
                     save_btn_txt: "Speichern",
                     menu_target_id:"menu",
-                    callback: besting
+                    callback: {
+                        name: replaceRegEx, // global callback, for all fields
+                        options: {
+                            search: /\s/g ,
+                            replace: "_"
+                        }
+                    }
                 });
-                
                $("h1").editMe({
                     css_highlight_class : "edit-me-highlight2",
                     target_url : "response.php"
@@ -110,24 +116,25 @@ $.datepicker.regional['de'] = {
                     username: {
                         type: "autocomplete",
                        source: "response.php?get=autocomplete",
-                       minLength : 2
+                       minLength : 3
                     },
-                    date: {
-                        type: "datepicker"
-                    },
-                    callback: {
-                        username: testing
+                    datum: {
+                        type: "datepicker",
+                        callback:{
+                            name: testing, // special callback for field <datum>
+                            options: 5
+                        }
                     }
                 });
             });
 
-function testing( text ) {
-    return text;
-}
+            function replaceRegEx( text, options) {
+                return text.replace(options.search, options.replace).trim();
+            }
 
-function besting ( text ) {
-    return text;
-}
+            function testing( text , options) {
+                return text;
+            }
 
         </script>
     </body>
