@@ -199,6 +199,18 @@ function editMeObj ( objects, options ) {
             return object;
         }
 
+        if ( options[name].type  == "radio" ) {
+            object = new editMeRadio( );
+            if ( typeof options[name].options != "undefined") {
+                object.setItem( item, options[name].options )
+            } else {
+            object.setItem( item )
+            }
+            object.setOptions( options )
+            object.setIndex( index )
+            return object;
+        }
+
         alert("No type selected");
     }
 
@@ -494,6 +506,43 @@ editMeDatepicker = function () {
 }
 
 editMeDatepicker.prototype = new editMeInput(  );
+editMeRadio = function () {
+    this.setItem = function ( object, itemOptions )  {
+        this.item = object;
+
+        object.buttonset();
+
+        if ( typeof itemOptions !== "undefined") {
+            for (var i = 0; i < itemOptions.length; i++ ) {
+                this.item.find("[type=radio]").eq(i).button(itemOptions[i])
+            }
+        }
+
+        object.buttonset("disable");
+    }
+
+    this.activate = function () {
+        if ( this.is_readonly() || typeof this.item.data("name") == "undefined") {
+            return this
+        }
+        if (typeof this.oldData == "undefined") {
+         this.oldData = this.getValue();
+        }
+        this.item.buttonset("enable")
+    }
+    this.standby = function () {
+        this.item.buttonset("disable");
+    }
+    this.reset = function () {
+        this.item.find("[value=" + this.oldData + "]").attr("checked", true);
+        this.item.buttonset("refresh");
+    }
+    this.getValue = function () {
+        return this.item.find("[type=radio]:checked").val();
+    }
+}
+
+editMeRadio.prototype = new editMeInput();
 
 function onlyInt( text ) {
     return parseInt(text)
