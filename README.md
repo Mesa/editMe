@@ -47,7 +47,7 @@ $("ul").editMe({
     css_highlight_class : "your-css-class", // optional
     target_url : "destination.php",
     callback: yourCallbackFunction, // callback for all items *optional*
-    options: {}                                   // options for your callback *optional*
+    options: {} // options for your callback *optional*
 });
 ```
 
@@ -55,9 +55,9 @@ $("ul").editMe({
 $("ul").editMe({
     css_highlight_class : "your-css-class",
     target_url : "destination.php",
-    username: {                                     // name provide by html attribute "data-name"
+    username: { // name provide by html attribute "data-name"
         callback: yourCallbackFunction,  // callback for items named "username"
-        options:  "text"                              // options for your callback
+        options:  "text" // options for your callback
     }
 });
 ```
@@ -65,17 +65,17 @@ $("ul").editMe({
 Special Input
 -----------------
 Sometimes you need some special input fields, jQueryUi got some nice plugins, like Datepicker or
-Autocomplete. To define an autocomplete field or a datepicker you add following lines to you config :
+Autocomplete. To define an autocomplete or a datepicker field, you add following lines to you config :
 
 ```javascript
 $("ul").editMe({
-    username: {                                          // name provide by html attribute "data-name"
-        type: "autocomplete",                       // type to display. The options are ( autocomplete | datepicker | input)
+    username: { // name provide by html attribute "data-name"
+        type: "autocomplete", // type to display. The options are ( autocomplete | datepicker | input | radio )
        source: "<path-to-your-php-file>", // response.php for example
        minLength : 2
     },
     date: {
-        type: "datepicker"                              // type to display. The options are ( autocomplete | datepicker | input)
+        type: "datepicker" // type to display. The options are ( autocomplete | datepicker | input | radio )
     },
 });
 ```
